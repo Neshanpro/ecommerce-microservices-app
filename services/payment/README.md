@@ -51,8 +51,6 @@ docker run -d \
   -e PAYMENT_PORT=50051 \
   payment-service:multi-stage
 ```
-
-
 ### 📊 Container Size Metrics Comparison
 
 | Architecture Strategy | Base Image Runtime | Security Profile | Final Image Size |
