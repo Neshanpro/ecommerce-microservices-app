@@ -3,59 +3,100 @@
 The Payment Service is a high-performance gRPC microservice responsible for processing, charging, and validating user payments across the application ecosystem.
 
 ## 🛠 Features & Architecture Updates
-* **gRPC Interface**: Communicates via high-performance remote procedure calls using Protocol Buffers.
-* **Production Hardened**: Upgraded to a multi-stage Docker configuration using an enterprise-grade Google Distroless runtime.
-* **Telemetry Ready**: Implements native OpenTelemetry hooks (`opentelemetry.js`) for tracing, logs, and metrics pipelines.
 
----
+- **gRPC Interface**: High-performance remote procedure calls using Protocol Buffers.
+- **Production Hardened**: Multi-stage Docker build with enterprise-grade Google Distroless runtime.
+- **Non-Root Security**: Runs as UID 10001 (non-root user).
+- **Telemetry Ready**: Native OpenTelemetry instrumentation for tracing and metrics.
 
 ## 💻 Local Development
 
-To run this microservice locally outside of a container environment, manually map the shared protocol buffer manifest:
+To run this microservice locally outside containers:
 
 ```bash
-# Navigate to the payment service directory
 cd services/payment
 
-# Copy the shared proto file locally
+# Copy the shared proto file
 cp ../../pb/demo.proto ./
 
-# Install exact version-locked dependencies
+# Install dependencies
 npm ci
 
-# Start the application locally
+# Start the service
 PAYMENT_PORT=50051 node index.js
 ```
 
----
-
 ## 🐳 Docker Deployment & Optimization Comparison
 
-This service features a highly optimized **Multi-Stage Build Pipeline** that drops unnecessary build utilities, shell components, and package managers to dramatically minimize attack surfaces and download sizes.
+### Build Instructions
 
-### 1. Build and Run via Docker Engine
-Because this microservice relies on a shared `pb/` directory layout at the repository root, you must pass the **root context (`.`)** when building:
+The service relies on the shared `pb/` directory, so build from repository root:
 
 ```bash
-# Execute build from the repository root
-cd /home/ubuntu/projects/ecommerce-microservices-app
+cd <repo-root>
 
-# Run the build command pointing to the root context
-docker build -f services/payment/Dockerfile -t payment-service:multi-stage .
+# Build the Single-Stage baseline (for size comparison)
+docker build -f services/payment/Dockerfile.initial -t payment:initial .
 
-# Run the container with necessary gRPC port mappings
-docker run -d \
-  --name payment-smoke-test \
-  -p 50051:50051 \
-  -e PORT=50051 \
-  -e PAYMENT_PORT=50051 \
-  payment-service:multi-stage
+# Build the Production Multi-Stage optimized version
+docker build -f services/payment/Dockerfile -t payment:optimized .
 ```
-### 📊 Container Size Metrics Comparison
 
-| Architecture Strategy | Base Image Runtime | Security Profile | Final Image Size |
+### Isolated Smoke Testing
+
+```bash
+# Run the optimized container
+docker run -d \
+  --name payment-test \
+  -p 50051:50051 \
+  -e PAYMENT_PORT=50051 \
+  payment:optimized
+```
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Single-Stage (Initial)** | `node:20` (Debian Full) | High Attack Surface (Contains curl, apt, bash, root tools) | **~1.77 GB** |
-| **Multi-Stage (Optimized)** | `gcr.io/distroless/nodejs20` | Enterprise Hardened (Zero shell utilities, Non-root UID) | **~265 MB** |
-<img width="1712" height="67" alt="Screenshot 2026-07-28 142532" src="https://github.com/user-attachments/assets/2a703f73-5f67-4734-b971-9df145daf67b" />
+| **PAYMENT_PORT** | Yes | — | Port for gRPC server to listen on |
 
+### Verification
+
+Check the logs:
+```bash
+docker logs payment-test
+```
+
+Expected output:
+```json
+{"level":"info","msg":"payment gRPC server started on port 50051"}
+```
+
+Test the gRPC connection:
+```bash
+curl -v localhost:50051
+```
+*Expected: Connection established.*
+
+Or with `grpcurl`:
+```bash
+grpcurl -plaintext localhost:50051 list
+```
+*Expected: Lists available gRPC services (e.g., oteldemo.PaymentService).*
+
+### Teardown
+
+```bash
+docker stop payment-test
+docker rm payment-test
+```
+
+## 📊 Container Size Metrics Comparison
+
+| Strategy | Base Image | Security Profile | Final Size |
+| :--- | :--- | :--- | :--- |
+| **Single-Stage (Initial)** | `node:20 (Debian)` | High attack surface (includes bash, apt, curl) | 1.71 GB |
+| **Multi-Stage (Optimized)** | `gcr.io/distroless/nodejs20-debian12` | Enterprise hardened (zero shell, non-root) | 265 MB |
+
+<img width="1797" height="42" alt="Screenshot 2026-07-29 041845" src="https://github.com" />
+
+**Savings:** 84.5% size reduction ✅
