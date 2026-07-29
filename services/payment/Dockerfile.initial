@@ -2,10 +2,15 @@ FROM node:20
 
 WORKDIR /usr/src/app
 
-COPY package*.json ./
-RUN npm install
+COPY ./services/payment/package*.json ./
+RUN npm install --only=production
 
-COPY . .
+COPY ./services/payment/ ./
 
+# Copy the shared proto file
+COPY ./pb/demo.proto ./demo.proto
+
+ENV PAYMENT_PORT=50051
 EXPOSE 50051
+
 CMD ["node", "index.js"]
