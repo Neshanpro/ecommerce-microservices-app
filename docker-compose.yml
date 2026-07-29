@@ -1,0 +1,49 @@
+services:
+  checkout:
+    image: public.ecr.aws/neshandoc/checkout:optimized
+    container_name: checkout-service
+    ports:
+      - "5050:5050"
+    environment:
+      - CHECKOUT_PORT=5050
+      - SHIPPING_ADDR=localhost:50050
+      - PRODUCT_CATALOG_ADDR=recommendation:9001
+      - CART_ADDR=localhost:7070
+      - CURRENCY_ADDR=localhost:7000
+      - EMAIL_ADDR=localhost:8080
+      - PAYMENT_ADDR=payment:50051
+      - FLAGD_ADDR=localhost:8013
+    networks:
+      - microservices-network
+    depends_on:
+      - payment
+      - recommendation
+    restart: unless-stopped
+
+  recommendation:
+    image: public.ecr.aws/neshandoc/recommendation:optimized
+    container_name: recommendation-service
+    ports:
+      - "9001:9001"
+    environment:
+      - RECOMMENDATION_PORT=9001
+      - OTEL_SERVICE_NAME=recommendation
+      - PRODUCT_CATALOG_ADDR=localhost:3550
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  payment:
+    image: public.ecr.aws/neshandoc/payment:optimized
+    container_name: payment-service
+    ports:
+      - "50051:50051"
+    environment:
+      - PAYMENT_PORT=50051
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+networks:
+  microservices-network:
+    driver: bridge
