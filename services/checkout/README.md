@@ -39,7 +39,7 @@ docker run -d \
   -e FLAGD_ADDR=localhost:8013 \
   checkout:optimized
   
-# Environment Variables
+Environment Variables:
 Variable	Required	Default	Description
 CHECKOUT_PORT	Yes	—	Port for gRPC server to listen on
 SHIPPING_ADDR	Yes	—	Address of Shipping service
@@ -50,18 +50,18 @@ EMAIL_ADDR	Yes	—	Address of Email service
 PAYMENT_ADDR	Yes	—	Address of Payment service
 FLAGD_ADDR	No	localhost:8013	Address of Feature Flag service
 
-# Verification
+Verification
 Check the logs to confirm the gRPC server started:
 docker logs checkout-test
 
-# Expected output:
+Expected output:
 {"message":"starting to listen on tcp: \"[::]:5050\"","severity":"info"}
 
-# Test the gRPC connection:
+Test the gRPC connection:
 curl -v localhost:5050
 Expected: Connection established (HTTP/0.9 error is normal for gRPC over HTTP/1.1).
 
-# Teardown
+Teardown
 docker stop checkout-test
 docker rm checkout-test
 
