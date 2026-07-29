@@ -96,18 +96,23 @@ docker rm payment-test
 | :--- | :--- | :--- | :--- |
 | **Single-Stage (Initial)** | `node:20 (Debian)` | High attack surface (includes bash, apt, curl) | 1.71 GB |
 | **Multi-Stage (Optimized)** | `gcr.io/distroless/nodejs20-debian12` | Enterprise hardened (zero shell, non-root) | 265 MB |
+
 <img width="1797" height="42" alt="Screenshot 2026-07-29 041845" src="https://github.com/user-attachments/assets/0738be24-9bd1-4634-ac13-4d58eea13353" />
+
 **Savings:** 84.5% size reduction ✅
 
+## 🔧 Troubleshooting
 
-🔧 Troubleshooting
-Cannot find module 'X'
+### Cannot find module 'X'
+* Verify that `package.json` and `package-lock.json` are properly copied in the Dockerfile.
+* Verify all Node.js dependencies are successfully installed during the container build stage via `npm ci`.
 
-Ensure requirements.txt is properly copied in the Dockerfile
-Verify all Node.js dependencies are installed during build stage
-Connection refused on port 50051
-
-Check that the container is still running: docker ps | grep payment
-View logs for startup errors: docker logs payment-test
-
-
+### Connection refused on port 50051
+* Check that the container is actively running: 
+  ```bash
+  docker ps | grep payment
+  ```
+* View runtime logs for startup configuration errors: 
+  ```bash
+  docker logs payment-test
+  ```
