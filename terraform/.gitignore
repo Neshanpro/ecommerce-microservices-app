@@ -1,0 +1,13 @@
+# Local state files 
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# Local variables (optional, for secrets)
+*.tfvars
+!example.tfvars
+
+# IDE
+.idea/
+*.swp
