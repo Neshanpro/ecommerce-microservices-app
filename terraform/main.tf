@@ -22,7 +22,7 @@ provider "aws" {
 
 # ==================== VPC MODULE ====================
 module "vpc" {
-  source = "./modules/vpc" # ✅ CHANGED
+  source = "./modules/vpc" 
 
   project_name         = var.project_name
   environment          = var.environment
@@ -35,7 +35,7 @@ module "vpc" {
 
 # ==================== IAM MODULE ====================
 module "iam" {
-  source = "./modules/iam" # ✅ CHANGED
+  source = "./modules/iam" 
 
   project_name = var.project_name
   common_tags  = local.common_tags
@@ -43,7 +43,7 @@ module "iam" {
 
 # ==================== EKS MODULE ====================
 module "eks" {
-  source = "./modules/eks" # ✅ CHANGED
+  source = "./modules/eks" 
 
   cluster_name         = var.cluster_name
   cluster_version      = var.cluster_version
