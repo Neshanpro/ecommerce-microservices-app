@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: checkout
+  namespace: ecommerce
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout
+  namespace: ecommerce
+  labels:
+    app: checkout
+    version: v1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: checkout
+  template:
+    metadata:
+      labels:
+        app: checkout
+        version: v1
+    spec:
+      serviceAccountName: checkout
+      containers:
+      - name: checkout
+        image: neshandoc/checkout:optimized
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: grpc
+          containerPort: 5050
+          protocol: TCP
+        env:
+        - name: CHECKOUT_PORT
+          value: "5050"
+        - name: SHIPPING_ADDR
+          value: "shipping:50050"
+        - name: PRODUCT_CATALOG_ADDR
+          value: "recommendation:9001"
+        - name: CART_ADDR
+          value: "cart:7070"
+        - name: CURRENCY_ADDR
+          value: "currency:7000"
+        - name: EMAIL_ADDR
+          value: "email:8080"
+        - name: PAYMENT_ADDR
+          value: "payment:50051"
+        - name: FLAGD_ADDR
+          value: "flagd:8013"
+        - name: OTEL_SERVICE_NAME
+          value: "checkout"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          tcpSocket:
+            port: 5050
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 5050
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65532
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: checkout
+  namespace: ecommerce
+  labels:
+    app: checkout
+spec:
+  type: ClusterIP
+  ports:
+  - name: grpc
+    port: 5050
+    targetPort: 5050
+    protocol: TCP
+  selector:
+    app: checkout
