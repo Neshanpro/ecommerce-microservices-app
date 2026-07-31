@@ -25,7 +25,7 @@ jobs:
     - name: Build & Push Checkout
       uses: docker/build-push-action@v4
       with:
-        context: ./services/checkout
+        context: .
         file: ./services/checkout/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/checkout:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/checkout:latest
@@ -33,7 +33,7 @@ jobs:
     - name: Build & Push Payment
       uses: docker/build-push-action@v4
       with:
-        context: ./services/payment
+        context: .
         file: ./services/payment/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/payment:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/payment:latest
@@ -41,7 +41,7 @@ jobs:
     - name: Build & Push Recommendation
       uses: docker/build-push-action@v4
       with:
-        context: ./services/recommendation
+        context: .
         file: ./services/recommendation/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/recommendation:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/recommendation:latest
