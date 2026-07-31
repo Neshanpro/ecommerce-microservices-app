@@ -42,9 +42,9 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
 
-	pb "github.com/neshanpro/ecommerce-microservices-app/services/checkout/genproto/oteldemo"
-	"github.com/neshanpro/ecommerce-microservices-app/services/checkout/kafka"
-	"github.com/neshanpro/ecommerce-microservices-app/services/checkout/money"
+	pb "github.com/open-telemetry/opentelemetry-demo/src/checkout/genproto/oteldemo"
+	"github.com/open-telemetry/opentelemetry-demo/src/checkout/kafka"
+	"github.com/open-telemetry/opentelemetry-demo/src/checkout/money"
 )
 
 //go:generate go install google.golang.org/protobuf/cmd/protoc-gen-go
@@ -609,4 +609,3 @@ func (cs *checkout) getIntFeatureFlag(ctx context.Context, featureFlagName strin
 
 	return int(featureFlagValue)
 }
-# test
