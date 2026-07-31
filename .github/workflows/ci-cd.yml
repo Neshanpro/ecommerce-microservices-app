@@ -25,7 +25,7 @@ jobs:
     - name: Build & Push Checkout
       uses: docker/build-push-action@v4
       with:
-        context: .
+        context: ./services/checkout
         file: ./services/checkout/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/checkout:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/checkout:latest
@@ -33,7 +33,7 @@ jobs:
     - name: Build & Push Payment
       uses: docker/build-push-action@v4
       with:
-        context: .
+        context: ./services/payment
         file: ./services/payment/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/payment:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/payment:latest
@@ -41,16 +41,16 @@ jobs:
     - name: Build & Push Recommendation
       uses: docker/build-push-action@v4
       with:
-        context: .
+        context: ./services/recommendation
         file: ./services/recommendation/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/recommendation:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/recommendation:latest
     
     - name: Update Kubernetes Manifests
       run: |
-        sed -i "s|neshandoc/checkout:optimized|neshandoc/checkout:${{ github.sha }}|g" kubernetes/checkout-deployment.yaml
-        sed -i "s|neshandoc/payment:optimized|neshandoc/payment:${{ github.sha }}|g" kubernetes/payment-deployment.yaml
-        sed -i "s|neshandoc/recommendation:optimized|neshandoc/recommendation:${{ github.sha }}|g" kubernetes/recommendation-deployment.yaml
+        sed -i "s|neshandoc/checkout:optimized|${{ secrets.DOCKER_USERNAME }}/checkout:${{ github.sha }}|g" kubernetes/checkout-deployment.yaml
+        sed -i "s|neshandoc/payment:optimized|${{ secrets.DOCKER_USERNAME }}/payment:${{ github.sha }}|g" kubernetes/payment-deployment.yaml
+        sed -i "s|neshandoc/recommendation:optimized|${{ secrets.DOCKER_USERNAME }}/recommendation:${{ github.sha }}|g" kubernetes/recommendation-deployment.yaml
     
     - name: Commit & Push
       run: |
@@ -59,3 +59,4 @@ jobs:
         git add kubernetes/
         git commit -m "Update images: ${{ github.sha }}" || true
         git push
+
