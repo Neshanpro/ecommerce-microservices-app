@@ -27,7 +27,7 @@ spec:
       serviceAccountName: checkout
       containers:
       - name: checkout
-        image: neshandoc/checkout:optimized
+        image: neshandoc/checkout:365f674fa58943ca774b00a8fd035ec15d18e4b0
         imagePullPolicy: IfNotPresent
         ports:
         - name: grpc
