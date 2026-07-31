@@ -34,7 +34,7 @@ jobs:
     - name: Build & Push Payment
       uses: docker/build-push-action@v4
       with:
-        context: ./services/payment
+        context: .
         file: ./services/payment/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/payment:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/payment:latest
