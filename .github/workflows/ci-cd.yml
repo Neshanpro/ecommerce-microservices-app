@@ -1,0 +1,61 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/**'
+      - '.github/workflows/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Build & Push Checkout
+      uses: docker/build-push-action@v4
+      with:
+        context: ./services/checkout
+        file: ./services/checkout/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/checkout:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/checkout:latest
+    
+    - name: Build & Push Payment
+      uses: docker/build-push-action@v4
+      with:
+        context: ./services/payment
+        file: ./services/payment/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/payment:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/payment:latest
+    
+    - name: Build & Push Recommendation
+      uses: docker/build-push-action@v4
+      with:
+        context: ./services/recommendation
+        file: ./services/recommendation/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/recommendation:${{ github.sha }},${{ secrets.DOCKER_USERNAME }}/recommendation:latest
+    
+    - name: Update Kubernetes Manifests
+      run: |
+        sed -i "s|neshandoc/checkout:optimized|neshandoc/checkout:${{ github.sha }}|g" kubernetes/checkout-deployment.yaml
+        sed -i "s|neshandoc/payment:optimized|neshandoc/payment:${{ github.sha }}|g" kubernetes/payment-deployment.yaml
+        sed -i "s|neshandoc/recommendation:optimized|neshandoc/recommendation:${{ github.sha }}|g" kubernetes/recommendation-deployment.yaml
+    
+    - name: Commit & Push
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git add kubernetes/
+        git commit -m "Update images: ${{ github.sha }}" || true
+        git push

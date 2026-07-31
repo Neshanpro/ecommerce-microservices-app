@@ -50,6 +50,8 @@ spec:
           value: "payment:50051"
         - name: FLAGD_ADDR
           value: "flagd:8013"
+        - name: OTEL_SDK_DISABLED
+          value: "true"  # (disable telemetry)
         - name: OTEL_SERVICE_NAME
           value: "checkout"
         resources:
