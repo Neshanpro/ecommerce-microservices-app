@@ -96,4 +96,4 @@ spec:
     targetPort: 5050
     protocol: TCP
   selector:
-    app: checkout
+    app: checkout 
