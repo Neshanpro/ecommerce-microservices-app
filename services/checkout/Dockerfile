@@ -1,17 +1,21 @@
 # --- STAGE 1: Builder ---
 FROM golang:1.22-alpine AS builder
 
-WORKDIR /usr/src/app
+# Replicate the repository structure root inside the container
+WORKDIR /usr/src
 
-# Copy dependency manifests
-COPY ./services/checkout/go.mod ./services/checkout/go.sum ./
-RUN go mod download
+# Copy checkout dependency manifests into their expected subdirectory structure
+COPY ./services/checkout/go.mod ./services/checkout/go.sum ./services/checkout/
+RUN cd services/checkout && go mod download
 
-# Copy the checkout service code and the shared pb folder natively
-COPY ./services/checkout/ ./
+# Copy the shared protocol buffers (pb) folder natively into /usr/src/pb
 COPY ./pb/ ./pb/
 
-# Compile the production binary cleanly
+# Copy the remaining checkout source code into its matching subdirectory
+COPY ./services/checkout/ ./services/checkout/
+
+# Pivot workspace into the service folder to compile cleanly
+WORKDIR /usr/src/services/checkout
 RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w" -o /out/checkout .
 
 # --- STAGE 2: Secure Distroless Runtime ---
