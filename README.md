@@ -125,10 +125,12 @@ All application images are built using multi-stage compilation and Google Distro
 | Microservice | Runtime | Standard Base Size | Distroless Optimized Size | Reduction |
 | :--- | :--- | :--- | :--- | :--- |
 | **Checkout** | Go | 1.34 GB | **37.2 MB** | **97.2% ⬇️** |
-<img width="1762" height="46" alt="Screenshot 2026-07-29 044641" src="https://github.com/user-attachments/assets/be0f5c95-ded2-4482-96fc-7175ab6eabf4" />
 | **Payment** | Node.js | 1.71 GB | **265.0 MB** | **84.5% ⬇️** |
-<img width="1797" height="42" alt="Screenshot 2026-07-29 041845" src="https://github.com/user-attachments/assets/aa0cf688-5c37-472e-8f3c-24c8c38e5e0e" />
 | **Recommendation**| Python | 276.0 MB | **238.0 MB** | **13.8% ⬇️** |
+
+---
+<img width="1762" height="46" alt="Screenshot 2026-07-29 044641" src="https://github.com/user-attachments/assets/be0f5c95-ded2-4482-96fc-7175ab6eabf4" />
+<img width="1797" height="42" alt="Screenshot 2026-07-29 041845" src="https://github.com/user-attachments/assets/aa0cf688-5c37-472e-8f3c-24c8c38e5e0e" />
 <img width="1721" height="85" alt="Screenshot 2026-07-29 040049" src="https://github.com/user-attachments/assets/fba9f321-da0a-41d8-b1cc-8cfed66c421f" />
 
 ---
