@@ -140,6 +140,29 @@ Modular Terraform configurations manage all underlying AWS resources:
 * **Access Management**: IAM Roles for Service Accounts (IRSA) via OIDC provider.
 ---
 
+### CI/CD Pipeline (GitHub Actions)
+Automated build and GitOps delivery workflow defined in `.github/workflows/ci-cd.yml`.
+
+```text
+ [ Push to main ] ──► [ Buildx Container Build ] ──► [ Push to Docker Hub ] ──► [ Update Manifests ] ──► [ Git Commit & Push ] ──► [ ArgoCD Auto-Sync ]
+```
+
+* **Triggers**: On push to `main` touching `services/**`, `pb/**`, or `.github/workflows/**`.
+* **Workflow Logic**:
+  1. **Multi-Service Build**: Builds images for `Checkout`, `Payment`, and `Recommendation` using Docker Buildx.
+  2. **Image Tagging**: Applies both immutable commit SHA (`${{ github.sha }}`) and `latest` tags before pushing to Docker Hub.
+  3. **GitOps Manifest Mutation**: Uses `sed` to dynamically update image tags inside `kubernetes/*-deployment.yaml`.
+  4. **Automated Commit**: Commits updated Kubernetes manifests back to the repository, triggering ArgoCD to reconcile the cluster state.
+
+#### Required Repository Secrets
+Configure these under **Settings > Secrets and variables > Actions**:
+
+| Secret Name | Usage |
+| :--- | :--- |
+| `DOCKER_USERNAME` | Docker Hub registry account username |
+| `DOCKER_PASSWORD` | Docker Hub Personal Access Token (PAT) |
+---
+
 ### Security Hardening
 Kubernetes deployments apply strict security context parameters at both pod and container levels:
 * **Non-Root Context**: Enforced execution under non-root user IDs (`65532` / `10001`).
