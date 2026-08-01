@@ -214,7 +214,21 @@ ArgoCD manages application deployment state continuously from the Git repository
 Metrics are scraped through Custom Resource Definitions (`ServiceMonitor`) configured to target application ports and exported to Grafana dashboards.
 
 ---
+## 📊 Incident Response
 
+A simulated failure was tested to validate the monitoring stack.
+
+**Simulated Scenario:** Redis OOM kill causing Checkout service failure
+
+**Results:**
+- ✅ Alert triggered within 30 seconds
+- ✅ Root cause identified: memory limit too low
+- ✅ Incident resolved within 5 minutes
+- ✅ **Action items defined** (Immediate, Short-term, Long-term)
+- ✅ **Monitoring additions configured** to prevent recurrence
+
+**Full Incident Report:** [incident-report.md](./incident-report.md)
+---
 ## 🔧 Project Directory Structure
 
 ```text
