@@ -1,0 +1,86 @@
+# Prometheus Alerting Rules
+# These rules define when alerts should trigger based on SLI breaches
+
+groups:
+  - name: service_alerts
+    interval: 30s
+    rules:
+      # CRITICAL: Service error rate exceeds 5%
+      - alert: HighErrorRate
+        expr: sli:service_error_rate > 5
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "High error rate detected on {{ $labels.service }}"
+          description: "Error rate is {{ $value }}% for service {{ $labels.service }} over the last 5 minutes."
+          runbook: "https://github.com/Neshanpro/ecommerce-microservices-app/wiki/HighErrorRate"
+          dashboard: "http://grafana:3000/d/15760"
+
+      # CRITICAL: Pod in CrashLoopBackOff
+      - alert: PodCrashLooping
+        expr: kube_pod_container_status_waiting{reason="CrashLoopBackOff"} > 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash-looping"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is in CrashLoopBackOff state."
+          runbook: "https://github.com/Neshanpro/ecommerce-microservices-app/wiki/PodCrashLooping"
+
+      # WARNING: Pod not ready for 5 minutes
+      - alert: PodNotReady
+        expr: kube_pod_status_ready{condition="false"} > 0
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} is not ready"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been not ready for 5 minutes."
+
+      # CRITICAL: No ecommerce pods running
+      - alert: NoEcommercePodsRunning
+        expr: count(kube_pod_status_ready{namespace="ecommerce", condition="true"}) == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "No ecommerce pods are running"
+          description: "All pods in ecommerce namespace are not ready. Services are down!"
+
+      # WARNING: Pod restarts > 5 in 10 minutes
+      - alert: HighPodRestarts
+        expr: sum(increase(kube_pod_container_status_restarts_total{namespace="ecommerce"}[10m])) by (pod) > 5
+        for: 2m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} has high restart count"
+          description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in the last 10 minutes."
+
+      # WARNING: Memory usage high (>80%)
+      - alert: HighMemoryUsage
+        expr: (sum(container_memory_working_set_bytes{namespace="ecommerce"}) by (pod) / sum(kube_pod_container_resource_limits{resource="memory"}) by (pod)) * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} has high memory usage"
+          description: "Memory usage is {{ $value }}% of limit for pod {{ $labels.pod }}."
+
+      # CRITICAL: CPU usage high (>80%)
+      - alert: HighCPUUsage
+        expr: (sum(rate(container_cpu_usage_seconds_total{namespace="ecommerce"}[5m])) by (pod) / sum(kube_pod_container_resource_limits{resource="cpu"}) by (pod)) * 100 > 80
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Pod {{ $labels.pod }} has high CPU usage"
+          description: "CPU usage is {{ $value }}% of limit for pod {{ $labels.pod }}."

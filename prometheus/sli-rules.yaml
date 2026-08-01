@@ -1,0 +1,26 @@
+# Service Level Indicator (SLI) Recording Rules
+# These rules define measurable metrics for service health
+
+groups:
+  - name: sli_rules
+    interval: 30s
+    rules:
+      # SLI: Average request latency (5-minute average)
+      - record: sli:service_latency:avg_5m
+        expr: avg(rate(http_request_duration_seconds_sum[5m]) / rate(http_request_duration_seconds_count[5m])) by (service)
+
+      # SLI: Error rate as percentage of total requests
+      - record: sli:service_error_rate
+        expr: (sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service)) * 100
+
+      # SLI: Service availability (percentage of successful requests)
+      - record: sli:service_availability
+        expr: (1 - (sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service))) * 100
+
+      # SLI: Pod readiness across ecommerce namespace
+      - record: sli:ecommerce_pods_ready
+        expr: sum(kube_pod_status_ready{namespace="ecommerce", condition="true"}) / sum(kube_pod_status_ready{namespace="ecommerce"}) * 100
+
+      # SLI: Pod restart count (stability indicator)
+      - record: sli:ecommerce_pod_restarts
+        expr: sum(kube_pod_container_status_restarts_total{namespace="ecommerce"}) by (pod)
