@@ -27,7 +27,7 @@ spec:
       serviceAccountName: payment
       containers:
       - name: payment
-        image: neshandoc/payment:optimized
+        image: neshandoc/payment:365f674fa58943ca774b00a8fd035ec15d18e4b0
         imagePullPolicy: IfNotPresent
         ports:
         - name: grpc

@@ -27,7 +27,7 @@ spec:
       serviceAccountName: recommendation
       containers:
       - name: recommendation
-        image: neshandoc/recommendation:optimized
+        image: neshandoc/recommendation:365f674fa58943ca774b00a8fd035ec15d18e4b0
         imagePullPolicy: IfNotPresent
         ports:
         - name: grpc
