@@ -129,9 +129,7 @@ All application images are built using multi-stage compilation and Google Distro
 | **Recommendation**| Python | 276.0 MB | **238.0 MB** | **13.8% ⬇️** |
 
 ---
-<img width="1762" height="46" alt="Screenshot 2026-07-29 044641" src="https://github.com/user-attachments/assets/be0f5c95-ded2-4482-96fc-7175ab6eabf4" />
-<img width="1797" height="42" alt="Screenshot 2026-07-29 041845" src="https://github.com/user-attachments/assets/aa0cf688-5c37-472e-8f3c-24c8c38e5e0e" />
-<img width="1721" height="85" alt="Screenshot 2026-07-29 040049" src="https://github.com/user-attachments/assets/fba9f321-da0a-41d8-b1cc-8cfed66c421f" />
+<img width="1732" height="140" alt="Screenshot 2026-08-01 030557" src="https://github.com/user-attachments/assets/14f0c73a-ce47-4761-b4e2-e9d51c6374de" />
 
 ---
 
